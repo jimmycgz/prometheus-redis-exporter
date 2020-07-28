@@ -22,4 +22,14 @@ curl localhost:19121/metrics | grep redis
 Config datasource: http://prometheus:9090
 Import dashboard id 4074 specifying datasource as Prometheus
 View metrics via below link
-http://localhost:3000/d/AuSZocVMz/prometheus-redis-by-addr-and-host?orgId=1&refresh=30s&var-addr=&var-host=redis_exporter2:9121&from=now-1h&to=now
+http://localhost:3000/d/AuSZocVMz/prometheus-redis-by-addr-and-host?orgId=1&refresh=30s&from=now-15m&to=now&var-addr=&var-host=redis_exporter1:9121
+
+
+### REMARKS
+port 19121/16379/9090 are accessible via 
+```
+curl localhost:port
+telnet localhost port
+```
+
+port 9121 6379 9090 are accessible via any container inside within the default network defined by docker-compose
