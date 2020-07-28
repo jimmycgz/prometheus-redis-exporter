@@ -1,0 +1,171 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prom
+---
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+  namespace: prom
+  name: redis-1
+spec:
+  containers:
+  - image: redis:4
+    name: redis-1
+    ports:
+    - containerPort: 6379
+
+      protocol: TCP
+---
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+  namespace: prom
+  name: redis-2
+spec:
+  containers:
+  - image: redis:4
+    name: redis-2
+    ports:
+    - containerPort: 6379
+
+      protocol: TCP
+---
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+  namespace: prom
+  name: redis-exporter-1
+spec:
+  containers:
+  - image: oliver006/redis_exporter:alpine
+    name: redis-exporter-1
+    args: ["--redis.addr="]
+    ports:
+    - containerPort: 9121
+
+      protocol: TCP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prom
+  name: prometheus-deployment
+  labels:
+    app: prometheus
+    purpose: example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+      purpose: example
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        purpose: example
+    spec:
+      containers:
+      - name: prom-1
+        image: prom/prometheus
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/prometheus/prometheus.yml
+            subPath: prometheus.yml
+        ports:
+        - containerPort: 9090
+      volumes:
+        - name: config-volume
+          configMap:
+           name: prometheus-example-cm
+---
+apiVersion: v1
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+        - targets:
+          - prometheus:9090
+
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__address__]
+          action: replace
+          regex: ([^:]+)(?::\d+)?
+          replacement: $1:6379
+          target_label: __address__
+
+      - job_name: 'redis-exporter'
+        static_configs:
+        - targets:
+          - redis-exporter-1:9121
+
+
+      - job_name: redis-exporter-targets
+        honor_timestamps: true
+        scrape_interval: 30s
+        scrape_timeout: 30s
+        metrics_path: /scrape
+        scheme: http
+        static_configs:
+        - targets:
+          - redis://redis-1:6379
+          - redis://redis-2:6379
+        relabel_configs:
+        - source_labels: [__address__]
+          separator: ;
+          regex: (.*)
+          target_label: __param_target
+          replacement: $1
+          action: replace
+        - source_labels: [__param_target]
+          separator: ;
+          regex: (.*)
+          target_label: instance
+          replacement: $1
+          action: replace
+        - separator: ;
+          regex: (.*)
+          target_label: __address__
+          replacement: redis-exporter-1:9121
+          action: replace
+        metric_relabel_configs:
+        - source_labels: [instance]
+          separator: ;
+          regex: redis://redis-([0-9]*):6379
+          target_label: alias
+          replacement: redis-${1}
+          action: replace
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2020-07-28T20:59:51Z"
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:data:
+        .: {}
+        f:prometheus.yml: {}
+    manager: kubectl
+    operation: Update
+    time: "2020-07-28T20:59:51Z"
+  name: prometheus-example-cm
+  namespace: prom
