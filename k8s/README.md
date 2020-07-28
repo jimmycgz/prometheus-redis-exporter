@@ -31,8 +31,14 @@ curl localhost:9121/metrics | grep -v "#"
 ```
 
 ## Exercise 2 <WIP>: Deploy 1pod Redis_Exporter to scrap from ElastiCache
+```
+  #Deploy in AWS EKS
+kaf exporter-EC.yaml
   
-
+#Test from bash in the redis pod
+kex prom <redis-pod> -- bash
+```
+  
 ## Exercise 3 <WIP>: Deploy 3 pods in a same namespace:Redis_Exporter, Redis and Prometheus
 
 * Generate configmap yaml 
