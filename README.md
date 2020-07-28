@@ -1,9 +1,16 @@
-# Steps to Implement Redis Exporter, integrating with Prometheus, Grafana
+# Learn Prometheus/Grafana from Zero to Hero
 
-## Test single target from your local docker, without Grafana
+Steps to Implement Redis Exporter, integrating with Prometheus, Grafana, to scrap metrics for all kinds of redis instances: EC2, Pod, ElastiCache by endpoint
+
+* Docker version
+* Docker-compose
+* K8S
+* Helm
+
+## Test single target (Redis container) from your local docker, without Grafana
 See readme from docker folder
 
-## Test multiple targets by docker compose
+## Test multiple targets (Redis containers) by docker compose
 
 ### Setup steps
 ```
