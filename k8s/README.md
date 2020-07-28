@@ -29,3 +29,17 @@ curl localhost:9121/metrics
 k port-forward $pod_id 9121:9121 -n redis
 curl localhost:9121/metrics | grep -v "#"
 ```
+## Deploy 3 pods in a same namespace:Redis_Exporter, Redis and Prometheus
+
+* Generate configmap yaml 
+```
+kubectl create configmap prometheus-example-cm --from-file ./prometheus.yml
+kg cm prometheus-example-cm -o yaml
+# Copy/paste the yaml content to redis-prom.yaml
+k delete cm prometheus-example-cm -n default
+```
+* Launch all pods 
+```
+kaf redis-prom.yaml
+
+```
