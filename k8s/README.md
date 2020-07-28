@@ -1,4 +1,4 @@
-## Deploy 2 containers in a same pod for Redis Exporter and Redis.
+## Exercise 1: Deploy 2 containers in a same pod for Redis Exporter and Redis.
 
 #### File list
 * redis-exporter-deploy-b4-v15.yaml might work for lower k8s versions
@@ -29,7 +29,7 @@ curl localhost:9121/metrics
 k port-forward $pod_id 9121:9121 -n redis
 curl localhost:9121/metrics | grep -v "#"
 ```
-## Deploy 3 pods in a same namespace:Redis_Exporter, Redis and Prometheus
+## Exercise 2: Deploy 3 pods in a same namespace:Redis_Exporter, Redis and Prometheus
 
 * Generate configmap yaml 
 ```
