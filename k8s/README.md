@@ -12,14 +12,20 @@ kuberctl apply -f ./redis-exporter-v18-tested.yaml
 #### Test 
 ```
 kg pods -n redis
-kdesc redis pod redis-7479d9b867-t5chf
+export pod_id=redis-7479d9b867-t5chf
+kdesc redis pod $pod_id
 kg deploy -n redis
 
 # check log for each container
-klo redis redis-7479d9b867-t5chf -c redis
-klo redis redis-7479d9b867-t5chf -c redis-exporter
+klo redis $pod_id -c redis
+klo redis $pod_id -c redis-exporter
+
+# Check metrics from inside redis container, 2 containers has the same localhost on pod level.
+kubectl exec -i -t -n redis $pod_id -c redis -- bash
+apt-get update && apt-get install -y curl
+curl localhost:9121/metrics
 
 # forward redis-exporter port to localhost
-k port-forward redis-7479d9b867-t5chf 9121:9121 -n redis
+k port-forward $pod_id 9121:9121 -n redis
 curl localhost:9121/metrics | grep -v "#"
 ```
