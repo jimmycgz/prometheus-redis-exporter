@@ -43,4 +43,7 @@ k delete cm prometheus-example-cm -n default
 kaf redis-prom.yaml
 ```
 #### Known issue:
-The scraping job config doesn't work, prom can't find the right redis pods. Will test hardcoded endpoint.
+The scraping job config doesn't work, prom can't find the right redis pods. So need to figure out how to bind the cluster role to filter pods like below solution:
+https://stackoverflow.com/questions/53908848/kubernetes-pods-nodes-is-forbidden
+
+Will test hardcoded endpoint.
