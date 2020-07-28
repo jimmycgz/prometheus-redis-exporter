@@ -34,7 +34,7 @@ http://localhost:3000/d/AuSZocVMz/prometheus-redis-by-addr-and-host?orgId=1&refr
 
 ### REMARKS
 
-Set below command for redis_exporter to avoid scraping from localhost
+Set below command for redis_exporter to avoid scraping from localhost at line 30 of docker-compose.yml
 ```
  --redis.addr=
 ```
