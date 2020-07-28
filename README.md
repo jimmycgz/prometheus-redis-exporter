@@ -33,6 +33,11 @@ http://localhost:3000/d/AuSZocVMz/prometheus-redis-by-addr-and-host?orgId=1&refr
 
 
 ### REMARKS
+
+Set below command for redis_exporter to avoid scraping from localhost
+```
+ --redis.addr=
+```
 port 19121/16379/9090 are accessible via 
 ```
 curl localhost:port
