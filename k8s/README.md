@@ -29,7 +29,11 @@ curl localhost:9121/metrics
 k port-forward $pod_id 9121:9121 -n redis
 curl localhost:9121/metrics | grep -v "#"
 ```
-## Exercise 2 <WIP>: Deploy 3 pods in a same namespace:Redis_Exporter, Redis and Prometheus
+
+## Exercise 2 <WIP>: Deploy 1pod Redis_Exporter to scrap from ElastiCache
+  
+
+## Exercise 3 <WIP>: Deploy 3 pods in a same namespace:Redis_Exporter, Redis and Prometheus
 
 * Generate configmap yaml 
 ```
