@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prom
+---
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+  namespace: prom
+  name: redis-1
+spec:
+  containers:
+  - image: redis:4
+    name: redis-1
+    ports:
+    - containerPort: 6379
+
+      protocol: TCP  
+---
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+  namespace: prom
+  name: redis-exporter-1
+spec:
+  containers:
+  - image: oliver006/redis_exporter:alpine
+    name: redis-exporter-1
+    args: ["--redis.addr=internal.elasticache.staging.com:6379"]
+    ports:
+    - containerPort: 9121
+
+      protocol: TCP
