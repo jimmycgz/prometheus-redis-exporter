@@ -1,0 +1,50 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+    - targets:
+      - prometheus:9090
+
+  - job_name: 'redis_exporter'
+    static_configs:
+    - targets:
+      - redis_exporter1:9121
+
+
+  - job_name: redis-exporter-targets
+    honor_timestamps: true
+    scrape_interval: 30s
+    scrape_timeout: 30s
+    metrics_path: /scrape
+    scheme: http
+    static_configs:
+    - targets:
+      - redis://redis1:6379
+      - redis://redis2:6379
+    relabel_configs:
+    - source_labels: [__address__]
+      separator: ;
+      regex: (.*)
+      target_label: __param_target
+      replacement: $1
+      action: replace
+    - source_labels: [__param_target]
+      separator: ;
+      regex: (.*)
+      target_label: instance
+      replacement: $1
+      action: replace
+    - separator: ;
+      regex: (.*)
+      target_label: __address__
+      replacement: redis_exporter1:9121
+      action: replace
+    metric_relabel_configs:
+    - source_labels: [instance]
+      separator: ;
+      regex: redis://redis([0-9]*):6379
+      target_label: alias
+      replacement: redis${1}
+      action: replace
