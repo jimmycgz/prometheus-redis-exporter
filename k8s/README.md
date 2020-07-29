@@ -30,7 +30,9 @@ k port-forward $pod_id 9121:9121 -n redis
 curl localhost:9121/metrics | grep -v "#"
 ```
 
-## Exercise 2 <WIP>: Deploy 1pod Redis_Exporter to scrap from ElastiCache
+## Exercise 2 <WIP>: Deploy 1 pod Redis_Exporter to scrap from ElastiCache
+Refer to https://itnext.io/kubernetes-monitoring-with-prometheus-exporters-a-service-discovery-and-its-roles-ce63752e5a1
+  
 ```
   #Deploy in AWS EKS
 kaf exporter-EC.yaml
@@ -53,7 +55,11 @@ k delete cm prometheus-example-cm -n default
 kaf redis-prom.yaml
 ```
 #### Known issue:
-The scraping job config doesn't work, prom can't find the right redis pods. So need to figure out how to bind the cluster role to filter pods like below solution:
+The scraping job config doesn't work, prom can't find the right redis pods. Two options to resolve this:
+
+Option 1: Create service for redis target, and scrap svc endpoint as stated at below post, 
+https://itnext.io/kubernetes-monitoring-with-prometheus-exporters-a-service-discovery-and-its-roles-ce63752e5a1
+
+Option 2: See below for how to bind the cluster role to filter pods like below solution:
 https://stackoverflow.com/questions/53908848/kubernetes-pods-nodes-is-forbidden
 
-Will test hardcoded endpoint.
