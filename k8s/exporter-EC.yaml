@@ -1,38 +1,121 @@
 ---
 apiVersion: v1
 kind: Namespace
+
 metadata:
   name: prom
 ---
 apiVersion: v1
-
 kind: Pod
 
 metadata:
   namespace: prom
-  name: redis-1
+  name: grafana
+  labels:
+    app: grafana
 spec:
   containers:
-  - image: redis:4
-    name: redis-1
+  - image: grafana/grafana:6.2.5
+    name: grafana
     ports:
-    - containerPort: 6379
+    - containerPort: 3000
 
-      protocol: TCP  
+      protocol: TCP
+
 ---
 apiVersion: v1
+kind: Service
 
+metadata:
+  namespace: prom
+  name: grafana
+spec:
+  selector:
+    app: grafana
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+
+---
+apiVersion: v1
 kind: Pod
 
 metadata:
   namespace: prom
   name: redis-exporter-1
+  labels:
+    app: redis-exporter-1
 spec:
   containers:
   - image: oliver006/redis_exporter:alpine
     name: redis-exporter-1
-    args: ["--redis.addr=internal.elasticache.staging.com:6379"]
+    args: ["--redis.addr=staging-elasticache.cache.amazonaws.com:6379"]
     ports:
     - containerPort: 9121
 
       protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  namespace: prom
+  name: redis-exporter
+spec:
+  selector:
+    app: redis-exporter-1
+  ports:
+  - protocol: TCP
+    port: 9121
+    targetPort: 9121
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  namespace: prom
+  name: prom1
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - protocol: TCP
+    port: 9090
+    targetPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prom
+  name: prometheus-deployment
+  labels:
+    app: prometheus
+    purpose: example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+      purpose: example
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        purpose: example
+    spec:
+      containers:
+      - name: prom-1
+        image: prom/prometheus
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/prometheus/prometheus.yml
+            subPath: prometheus.yml
+        ports:
+        - containerPort: 9090
+      volumes:
+        - name: config-volume
+          configMap:
+           name: prometheus-example-cm
